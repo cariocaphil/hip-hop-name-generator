@@ -45,7 +45,7 @@ const NameForm = ({ onFormSubmit }) => {
       <br />
       <br></br>
 
-      <button type="submit" tabIndex="-1">Submit Form</button>
+      <button type="submit" tabIndex="-1">Generate New Name</button>
     </form>
   );
 };
