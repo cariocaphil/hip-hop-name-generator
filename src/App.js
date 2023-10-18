@@ -16,17 +16,13 @@ const App = () => {
     setLoading(false);
   };
 
-  const goToWikipedia = () => {
-    window.location.href = 'https://en.wikipedia.org/wiki/Hip_hop_artists';
-  };
-
   return (
     <div className="container">
       <h1>Hip Hop Name Generator</h1>
       <h3>Unhappy with how your friends or colleagues call you? Looking for a cool name based on your real one?</h3>
-      <span className="link" onClick={goToWikipedia}>
-        Link: check out the names of hip hop artists on wikipedia
-      </span>
+      <a href="https://en.wikipedia.org/wiki/Hip_hop_artists" className="link">
+        Explore hip hop artist names on Wikipedia
+      </a>
       <br></br>
       <img src={dancerImage} style={{ width: '200px' }} />
       <NameForm onFormSubmit={handleFormSubmit} />
