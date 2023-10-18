@@ -26,8 +26,8 @@ const App = () => {
       <br></br>
       <img src={dancerImage} alt="Dancer Illustration" style={{ width: '200px' }} />
       <NameForm onFormSubmit={handleFormSubmit} />
-      {loading ? <p>Loading...</p> : 
-        (hipHopName !== null ? 
+      {loading ? <p>Loading...</p> :
+        (hipHopName !== null ?
           <p>Your hip hop name is: {hipHopName}</p> :
           <p role="alert">API not available</p>
         )
