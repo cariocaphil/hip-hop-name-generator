@@ -24,17 +24,17 @@ const NameForm = ({ onFormSubmit }) => {
 
   return (
     <form onSubmit={handleSubmit} style={{ textAlign: 'center' }}>
-      Real Name:
-      <input type="text" value={name} onChange={handleChange} style={{ marginLeft: '8px', verticalAlign: 'middle' }} tabIndex="-1"/>
+      <label htmlFor="name">Real Name:</label>
+      <input type="text" id="name" value={name} onChange={handleChange} style={{ marginLeft: '8px', verticalAlign: 'middle' }} tabIndex="-1"/>
       <br></br>
 
       <br />
-      Further Information:
-      <textarea value={additionalInfo} onChange={handleInfoChange} style={{ marginLeft: '8px', verticalAlign: 'middle' }} tabIndex="2" />
+      <label htmlFor="info">Further Information:</label>
+      <textarea id="info" value={additionalInfo} onChange={handleInfoChange} style={{ marginLeft: '8px', verticalAlign: 'middle' }} tabIndex="2" />
       <br />
       <br></br>
-       Choose a prefix if you want one:
-      <select value={prefix} onChange={handlePrefixChange} >
+      <label htmlFor="prefix">Choose a prefix if you want one:</label>
+      <select id="prefix" value={prefix} onChange={handlePrefixChange} >
         <option value="">-- No prefix --</option>
         <option value="Lil">Option 1</option>
         <option value="MC">Option 2</option>
