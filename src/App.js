@@ -29,7 +29,7 @@ const App = () => {
       {loading ? <p>Loading...</p> : 
         (hipHopName !== null ? 
           <p>Your hip hop name is: {hipHopName}</p> :
-          <p>API not available</p>
+          <p role="alert">API not available</p>
         )
       }
     </div>
