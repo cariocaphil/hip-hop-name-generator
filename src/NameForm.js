@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import ListComponent from './ListComponent';
 
 const NameForm = ({ onFormSubmit }) => {
   const [name, setName] = useState('');
   const [additionalInfo, setAdditionalInfo] = useState('');
-  const [prefix, setPrefix] = useState('Lil');
+  const [prefix, setPrefix] = useState('');
 
   const handleChange = (e) => {
     setName(e.target.value);
@@ -36,14 +37,11 @@ const NameForm = ({ onFormSubmit }) => {
 
       <div style={{ marginBottom: '10px' }}>
         <label htmlFor="prefix">Choose a prefix if you want one: </label>
-        <select id="prefix" value={prefix} onChange={handlePrefixChange} >
-          <option value="">-- No prefix --</option>
-          <option value="Lil">Lil</option>
-          <option value="MC">MC</option>
-          <option value="DJ">DJ</option>
-          <option value="DR">DR</option>
-          <option value="BIG">BIG</option>
-        </select>
+        <ListComponent
+          options={['Lil', 'MC', 'DJ', 'DR', 'BIG']}
+          selectedOption={prefix}
+          onSelect={(selected) => setPrefix(selected)}
+      />
       </div>
 
       <button type="submit">Generate New Name</button>
