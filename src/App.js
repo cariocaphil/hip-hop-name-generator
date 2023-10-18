@@ -22,8 +22,8 @@ const App = () => {
 
   return (
     <div className="container">
-      <h3>Hip Hop Name Generator</h3>
-      <h1>Unhappy with how your friends or colleagues call you? Looking for a cool name based on your real one?</h1>
+      <h1>Hip Hop Name Generator</h1>
+      <h3>Unhappy with how your friends or colleagues call you? Looking for a cool name based on your real one?</h3>
       <span className="link" onClick={goToWikipedia}>
         Link: check out the names of hip hop artists on wikipedia
       </span>
