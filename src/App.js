@@ -24,7 +24,7 @@ const App = () => {
         Explore hip hop artist names on Wikipedia
       </a>
       <br></br>
-      <img src={dancerImage} style={{ width: '200px' }} />
+      <img src={dancerImage} alt="Dancer Illustration" style={{ width: '200px' }} />
       <NameForm onFormSubmit={handleFormSubmit} />
       {loading ? <p>Loading...</p> : 
         (hipHopName !== null ? 
