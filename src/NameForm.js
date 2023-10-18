@@ -25,12 +25,12 @@ const NameForm = ({ onFormSubmit }) => {
   return (
     <form onSubmit={handleSubmit} style={{ textAlign: 'center' }}>
       <label htmlFor="name">Real Name:</label>
-      <input type="text" id="name" value={name} onChange={handleChange} style={{ marginLeft: '8px', verticalAlign: 'middle' }} tabIndex="-1"/>
+      <input type="text" id="name" value={name} onChange={handleChange} style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
       <br></br>
 
       <br />
       <label htmlFor="info">Further Information:</label>
-      <textarea id="info" value={additionalInfo} onChange={handleInfoChange} style={{ marginLeft: '8px', verticalAlign: 'middle' }} tabIndex="2" />
+      <textarea id="info" value={additionalInfo} onChange={handleInfoChange} style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
       <br />
       <br></br>
       <label htmlFor="prefix">Choose a prefix if you want one:</label>
@@ -45,7 +45,7 @@ const NameForm = ({ onFormSubmit }) => {
       <br />
       <br></br>
 
-      <button type="submit" tabIndex="-1">Generate New Name</button>
+      <button type="submit">Generate New Name</button>
     </form>
   );
 };
