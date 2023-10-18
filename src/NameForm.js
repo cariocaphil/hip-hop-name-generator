@@ -36,11 +36,11 @@ const NameForm = ({ onFormSubmit }) => {
       <label htmlFor="prefix">Choose a prefix if you want one:</label>
       <select id="prefix" value={prefix} onChange={handlePrefixChange} >
         <option value="">-- No prefix --</option>
-        <option value="Lil">Option 1</option>
-        <option value="MC">Option 2</option>
-        <option value="DJ">Option 3</option>
-        <option value="DR">Option 4</option>
-        <option value="BIG">Option 5</option>
+        <option value="Lil">Lil</option>
+        <option value="MC">MC</option>
+        <option value="DJ">DJ</option>
+        <option value="DR">DR</option>
+        <option value="BIG">BIG</option>
       </select>
       <br />
       <br></br>
