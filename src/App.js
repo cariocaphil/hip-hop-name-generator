@@ -16,24 +16,20 @@ const App = () => {
     setLoading(false);
   };
 
-  const goToWikipedia = () => {
-    window.location.href = 'https://en.wikipedia.org/wiki/Hip_hop_artists';
-  };
-
   return (
     <div className="container">
-      <h3>Hip Hop Name Generator</h3>
-      <h1>Unhappy with how your friends or colleagues call you? Looking for a cool name based on your real one?</h1>
-      <span className="link" onClick={goToWikipedia}>
-        Link: check out the names of hip hop artists on wikipedia
-      </span>
+      <h1>Hip Hop Name Generator</h1>
+      <h2>Unhappy with how your friends or colleagues call you? Looking for a cool name based on your real one?</h2>
+      <a href="https://en.wikipedia.org/wiki/Hip_hop_artists" className="link">
+        Explore hip hop artist names on Wikipedia
+      </a>
       <br></br>
-      <img src={dancerImage} style={{ width: '200px' }} />
+      <img src={dancerImage} alt="Dancer Illustration" style={{ width: '200px' }} />
       <NameForm onFormSubmit={handleFormSubmit} />
-      {loading ? <p>Loading...</p> : 
-        (hipHopName !== null ? 
+      {loading ? <p>Loading...</p> :
+        (hipHopName !== null ?
           <p>Your hip hop name is: {hipHopName}</p> :
-          <p>API not available</p>
+          <p role="alert">API not available</p>
         )
       }
     </div>
