@@ -1,32 +1,57 @@
-const generateHipHopName = async (name, additionalInfo, prefix) => {
-  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
-  const prompt = `Transform the name "${name}" into a hip hop star name, and consider the additional information about the person having that name, "${additionalInfo}", and the prefix chosen "${prefix}" :`;
-
+/**
+ * Browser client for hip-hop name generation.
+ * Calls the local API — never the OpenAI API or a client-side API key.
+ *
+ * @returns {Promise<{ ok: true, hipHopName: string } | { ok: false, error: string }>}
+ */
+const generateHipHopName = async (realName, furtherInformation, prefix) => {
   try {
-    const response = await fetch('https://api.openai.com/v1/engines/davinci/completions', {
+    const response = await fetch('/api/generate-hip-hop-name', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        prompt: prompt,
-        max_tokens: 50,
-        n: 1,
-        stop: ['\n'],
-      }),
+      body: JSON.stringify({ realName, furtherInformation, prefix }),
     });
 
-    const data = await response.json();
-    if (data.choices && data.choices.length > 0 && data.choices[0].text) {
-      const hipHopName = data.choices[0].text.trim();
-      return hipHopName;
-    } else {
-      return null;
+    let data = null;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      console.error('Name generation response was not JSON', {
+        status: response.status,
+        message: parseError?.message,
+      });
     }
+
+    if (!response.ok) {
+      const error =
+        data?.error || 'Unable to generate a name right now. Please try again.';
+      console.error('Name generation request failed', {
+        status: response.status,
+        error,
+      });
+      return { ok: false, error };
+    }
+
+    const hipHopName = typeof data?.hipHopName === 'string' ? data.hipHopName.trim() : '';
+    if (!hipHopName) {
+      console.error('Name generation returned an empty hipHopName field', {
+        status: response.status,
+      });
+      return {
+        ok: false,
+        error: 'The name generator returned an empty result. Please try again.',
+      };
+    }
+
+    return { ok: true, hipHopName };
   } catch (error) {
-    console.error('Error generating hip hop name:', error);
-    return null;
+    console.error('Name generation network error', { message: error?.message });
+    return {
+      ok: false,
+      error: 'Unable to reach the name generator. Is the API server running?',
+    };
   }
 };
 

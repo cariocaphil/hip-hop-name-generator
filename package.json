@@ -2,21 +2,30 @@
   "name": "hip-hop-name-generator",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "openai": "^4.12.1",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "openai": "^6.49.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently -k -n api,web -c blue,green \"npm run start:api\" \"npm run start:web\"",
+    "start:api": "node server/index.js",
+    "start:web": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "lint": "eslint \"src/**/*.{js,jsx}\" --max-warnings=0",
+    "test:server": "node --test server/*.test.js",
+    "lint": "eslint \"src/**/*.{js,jsx}\" \"server/**/*.js\" --max-warnings=0",
     "eject": "react-scripts eject"
   },
   "engines": {
@@ -26,6 +35,16 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "server/**/*.js"
+        ],
+        "env": {
+          "node": true
+        }
+      }
     ]
   },
   "browserslist": {

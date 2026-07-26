@@ -5,7 +5,7 @@ import AfterNameForm from './AfterNameForm';
 /**
  * Current accessible App chrome (post accessibility-improvements merge).
  */
-const AfterAppContent = ({ onFormSubmit, loading, hipHopName }) => {
+const AfterAppContent = ({ onFormSubmit, loading, hipHopName, errorMessage }) => {
   return (
     <div className="container">
       <h1>Hip Hop Name Generator</h1>
@@ -24,7 +24,9 @@ const AfterAppContent = ({ onFormSubmit, loading, hipHopName }) => {
       ) : hipHopName !== null ? (
         <p>Your hip hop name is: {hipHopName}</p>
       ) : (
-        <p role="alert">API not available</p>
+        <p role="alert">
+          {errorMessage || 'Unable to generate a name right now. Please try again.'}
+        </p>
       )}
     </div>
   );

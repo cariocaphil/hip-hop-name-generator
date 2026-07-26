@@ -6,6 +6,40 @@ On the surface it generates a playful hip-hop stage name from your real name. Un
 
 It was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Local setup
+
+1. Copy the example env file and add your OpenAI key (**server-side only** — never use `REACT_APP_*` / `VITE_*` for this secret):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Set:
+
+   - `OPENAI_API_KEY` — required for name generation
+   - `OPENAI_MODEL` — optional (defaults to `gpt-4.1-nano`)
+   - `PORT` — optional API port (defaults to `3001`)
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Start the API and React app together:
+
+   ```bash
+   npm start
+   ```
+
+   This runs Express on port `3001` and CRA on port `3000`. In development, CRA proxies `/api/*` to the API server so the browser never talks to OpenAI directly.
+
+### Name generation architecture
+
+- The React app calls `POST /api/generate-hip-hop-name`.
+- The Express server uses the official OpenAI JavaScript SDK and the **Responses API**.
+- The model name lives in `server/config.js` (`OPENAI_MODEL` / default `gpt-4.1-nano`).
+
 ## Before-and-after comparison
 
 Use the **Demo comparison** control at the top of the page (or the URL) to switch modes without a reload:
@@ -48,16 +82,22 @@ In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.\
+Runs the API server and the React app together.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+
+Use `npm run start:api` or `npm run start:web` if you need either process on its own.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
 ### `npm test`
 
-Launches the test runner in the interactive watch mode.\
+Launches the React test runner in interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run test:server`
+
+Runs the Express / OpenAI proxy unit tests with Node’s built-in test runner.
 
 ### `npm run build`
 
