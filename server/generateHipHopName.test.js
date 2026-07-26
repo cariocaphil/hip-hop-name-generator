@@ -12,7 +12,7 @@ test('sanitizeGeneratedName strips quotes and takes the first line', () => {
   assert.equal(sanitizeGeneratedName('**MC Shadow**'), 'MC Shadow');
 });
 
-test('buildNameGenerationInput includes name, info, and prefix', () => {
+test('buildNameGenerationInput includes real name, further information, and prefix', () => {
   const input = buildNameGenerationInput('Alex', 'loves jazz', 'Lil');
   assert.match(input, /Alex/);
   assert.match(input, /loves jazz/);
@@ -30,8 +30,8 @@ test('generateHipHopNameWithOpenAI returns sanitized model text', async () => {
   };
 
   const name = await generateHipHopNameWithOpenAI({
-    name: 'Alex',
-    additionalInfo: 'cool',
+    realName: 'Alex',
+    furtherInformation: 'cool',
     prefix: 'DJ',
     client,
   });
@@ -50,7 +50,7 @@ test('generateHipHopNameWithOpenAI rejects empty model output', async () => {
   };
 
   await assert.rejects(
-    () => generateHipHopNameWithOpenAI({ name: 'Alex', client }),
+    () => generateHipHopNameWithOpenAI({ realName: 'Alex', client }),
     (error) => error.code === 'EMPTY_MODEL_OUTPUT'
   );
 });
@@ -68,12 +68,81 @@ test('POST /api/generate-hip-hop-name returns a name on success', async () => {
     const response = await fetch(`http://127.0.0.1:${port}/api/generate-hip-hop-name`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Alex', additionalInfo: 'jazz', prefix: 'Lil' }),
+      body: JSON.stringify({
+        realName: 'Alex',
+        furtherInformation: 'jazz',
+        prefix: 'Lil',
+      }),
     });
     const body = await response.json();
 
     assert.equal(response.status, 200);
     assert.equal(body.hipHopName, 'Lil Echo');
+  } finally {
+    server.close();
+  }
+});
+
+test('POST /api/generate-hip-hop-name accepts the shared Phil contract body', async () => {
+  process.env.OPENAI_API_KEY = 'test-key';
+  let received;
+
+  const app = createApp({
+    generateName: async (params) => {
+      received = params;
+      return 'MC Rio Phil';
+    },
+  });
+
+  const server = app.listen(0);
+  const { port } = server.address();
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/generate-hip-hop-name`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        realName: 'Phil',
+        furtherInformation: 'wanna live in rio',
+        prefix: 'MC',
+      }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.hipHopName, 'MC Rio Phil');
+    assert.deepEqual(received, {
+      realName: 'Phil',
+      furtherInformation: 'wanna live in rio',
+      prefix: 'MC',
+    });
+  } finally {
+    server.close();
+  }
+});
+
+test('POST /api/generate-hip-hop-name returns 400 when realName is missing', async () => {
+  process.env.OPENAI_API_KEY = 'test-key';
+  const app = createApp({
+    generateName: async () => 'should-not-run',
+  });
+
+  const server = app.listen(0);
+  const { port } = server.address();
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/generate-hip-hop-name`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        furtherInformation: 'wanna live in rio',
+        prefix: 'MC',
+      }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.match(body.error, /real name/i);
   } finally {
     server.close();
   }
@@ -97,7 +166,7 @@ test('POST /api/generate-hip-hop-name maps upstream failures to a friendly error
     const response = await fetch(`http://127.0.0.1:${port}/api/generate-hip-hop-name`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Alex' }),
+      body: JSON.stringify({ realName: 'Alex' }),
     });
     const body = await response.json();
 
@@ -125,7 +194,7 @@ test('POST /api/generate-hip-hop-name handles empty model output', async () => {
     const response = await fetch(`http://127.0.0.1:${port}/api/generate-hip-hop-name`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Alex' }),
+      body: JSON.stringify({ realName: 'Alex' }),
     });
     const body = await response.json();
 

@@ -8,19 +8,19 @@ const {
 
 /**
  * Calls OpenAI Responses API and returns a cleaned hip-hop name.
- * @param {{ name: string, additionalInfo?: string, prefix?: string, client?: import('openai').default }} params
+ * @param {{ realName: string, furtherInformation?: string, prefix?: string, client?: import('openai').default }} params
  * @returns {Promise<string>}
  */
 async function generateHipHopNameWithOpenAI({
-  name,
-  additionalInfo = '',
+  realName,
+  furtherInformation = '',
   prefix = '',
   client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY }),
 }) {
   const response = await client.responses.create({
     model: OPENAI_MODEL,
     instructions: NAME_GENERATION_INSTRUCTIONS,
-    input: buildNameGenerationInput(name, additionalInfo, prefix),
+    input: buildNameGenerationInput(realName, furtherInformation, prefix),
     max_output_tokens: 40,
   });
 

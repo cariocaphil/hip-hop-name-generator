@@ -34,8 +34,8 @@ describe('generateHipHopName', () => {
 
     const body = JSON.parse(global.fetch.mock.calls[0][1].body);
     expect(body).toEqual({
-      name: 'Alex',
-      additionalInfo: 'loves jazz',
+      realName: 'Alex',
+      furtherInformation: 'loves jazz',
       prefix: 'Lil',
     });
   });

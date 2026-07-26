@@ -1,13 +1,13 @@
 /**
  * Builds the Responses API prompt so the model returns only a hip-hop name.
  */
-function buildNameGenerationInput(name, additionalInfo, prefix) {
-  const info = additionalInfo?.trim() ? additionalInfo.trim() : 'none provided';
+function buildNameGenerationInput(realName, furtherInformation, prefix) {
+  const info = furtherInformation?.trim() ? furtherInformation.trim() : 'none provided';
   const prefixText = prefix?.trim() ? prefix.trim() : 'none';
 
   return [
     'Create a short, catchy hip-hop stage name.',
-    `Real name: ${name}`,
+    `Real name: ${realName}`,
     `Additional information: ${info}`,
     `Preferred prefix (include it when not "none"): ${prefixText}`,
     'Respond with only the stage name. No quotes, markdown, punctuation wrappers, or explanation.',

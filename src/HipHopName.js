@@ -4,14 +4,14 @@
  *
  * @returns {Promise<{ ok: true, hipHopName: string } | { ok: false, error: string }>}
  */
-const generateHipHopName = async (name, additionalInfo, prefix) => {
+const generateHipHopName = async (realName, furtherInformation, prefix) => {
   try {
     const response = await fetch('/api/generate-hip-hop-name', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, additionalInfo, prefix }),
+      body: JSON.stringify({ realName, furtherInformation, prefix }),
     });
 
     let data = null;

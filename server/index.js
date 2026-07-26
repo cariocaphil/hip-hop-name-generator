@@ -12,12 +12,13 @@ function createApp({ generateName = generateHipHopNameWithOpenAI } = {}) {
   });
 
   app.post('/api/generate-hip-hop-name', async (req, res) => {
-    const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
-    const additionalInfo =
-      typeof req.body?.additionalInfo === 'string' ? req.body.additionalInfo : '';
+    const realName =
+      typeof req.body?.realName === 'string' ? req.body.realName.trim() : '';
+    const furtherInformation =
+      typeof req.body?.furtherInformation === 'string' ? req.body.furtherInformation : '';
     const prefix = typeof req.body?.prefix === 'string' ? req.body.prefix : '';
 
-    if (!name) {
+    if (!realName) {
       return res.status(400).json({
         error: 'Please enter a real name to generate a hip-hop name.',
       });
@@ -31,7 +32,7 @@ function createApp({ generateName = generateHipHopNameWithOpenAI } = {}) {
     }
 
     try {
-      const hipHopName = await generateName({ name, additionalInfo, prefix });
+      const hipHopName = await generateName({ realName, furtherInformation, prefix });
       return res.json({ hipHopName });
     } catch (error) {
       const status = error?.status && Number.isInteger(error.status) ? error.status : 502;
