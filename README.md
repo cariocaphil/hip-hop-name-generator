@@ -1,13 +1,19 @@
-# Getting Started with Create React App
+# Hip Hop Name Generator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A small React app that illustrates **accessibility (a11y) issues** in a fun, before-and-after way.
 
-## Accessibility comparison toggle (demo)
+On the surface it generates a playful hip-hop stage name from your real name. Underneath, it is a teaching and portfolio demo: you can flip between an intentionally flawed UI and an improved, accessible version of the same flow, and see how markup, keyboard behaviour, labels, contrast, and announcements change.
 
-This app includes a **demo-only** control that switches between two UI versions so reviewers can compare accessibility work side by side:
+It was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Before-and-after comparison
+
+Use the **Demo comparison** control at the top of the page (or the URL) to switch modes without a reload:
 
 - **After accessibility** (default) — the current accessible implementation
 - **Before accessibility** — reconstructed from Git history immediately before the accessibility improvements were merged
+
+The “before” mode is meant to show common a11y pitfalls (missing labels, bad heading order, non-semantic links, poor contrast, and so on) against the fixed “after” experience—not as a production preference.
 
 ### Historical source
 
@@ -34,7 +40,7 @@ Shared across both modes: OpenAI name generation, app state, and unrelated busin
 
 ### Removing the comparison later
 
-Delete `src/accessibility-comparison/`, point `App.js` back at a single UI (the `after` components), restore a simple `NameForm` export, and drop the README section.
+Delete `src/accessibility-comparison/`, point `App.js` back at a single UI (the `after` components), restore a simple `NameForm` export, and drop this section from the README.
 
 ## Available Scripts
 
