@@ -1,8 +1,60 @@
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from './App';
+import generateHipHopName from './HipHopName';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+jest.mock('./HipHopName');
+jest.mock('./images/dancer.png', () => 'dancer.png');
+
+describe('App', () => {
+  beforeEach(() => {
+    generateHipHopName.mockReset();
+  });
+
+  test('renders title, description, and wikipedia link', () => {
+    render(<App />);
+
+    expect(screen.getByRole('heading', { name: /hip hop name generator/i })).toBeInTheDocument();
+    expect(
+      screen.getByText(/unhappy with how your friends or colleagues call you/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /explore hip hop artist names on wikipedia/i })
+    ).toHaveAttribute('href', 'https://en.wikipedia.org/wiki/Hip_hop_artists');
+  });
+
+  test('shows generated name after successful form submit', async () => {
+    let resolveName;
+    generateHipHopName.mockReturnValue(
+      new Promise((resolve) => {
+        resolveName = resolve;
+      })
+    );
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/real name/i), { target: { value: 'Alex' } });
+    fireEvent.click(screen.getByRole('button', { name: /generate new name/i }));
+
+    await waitFor(() => {
+      expect(generateHipHopName).toHaveBeenCalledWith('Alex', '', 'Lil');
+    });
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+
+    await act(async () => {
+      resolveName('MC Shadow');
+    });
+
+    expect(screen.getByText(/your hip hop name is: mc shadow/i)).toBeInTheDocument();
+  });
+
+  test('shows alert when API returns null', async () => {
+    generateHipHopName.mockResolvedValue(null);
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/real name/i), { target: { value: 'Alex' } });
+    fireEvent.click(screen.getByRole('button', { name: /generate new name/i }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/api not available/i);
+  });
 });
