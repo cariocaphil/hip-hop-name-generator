@@ -1,15 +1,34 @@
+const path = require('path');
+
 /**
  * Server-side configuration for OpenAI name generation.
- * Keep model selection here (or via OPENAI_MODEL) — never hard-code it at call sites.
+ * Values are read from process.env at call time so they pick up dotenv after startup.
  */
 const DEFAULT_OPENAI_MODEL = 'gpt-4.1-nano';
+const ENV_FILE_PATH = path.resolve(__dirname, '..', '.env');
 
-const OPENAI_MODEL = process.env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL;
+function loadEnv() {
+  // Always load the project-root .env (not cwd-dependent).
+  return require('dotenv').config({ path: ENV_FILE_PATH });
+}
 
-const PORT = Number(process.env.PORT) || 3001;
+function getOpenAIModel() {
+  return process.env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL;
+}
+
+function getPort() {
+  return Number(process.env.PORT) || 3001;
+}
+
+function isOpenAIApiKeyConfigured() {
+  return Boolean(process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim());
+}
 
 module.exports = {
   DEFAULT_OPENAI_MODEL,
-  OPENAI_MODEL,
-  PORT,
+  ENV_FILE_PATH,
+  loadEnv,
+  getOpenAIModel,
+  getPort,
+  isOpenAIApiKeyConfigured,
 };

@@ -57,6 +57,23 @@ describe('generateHipHopName', () => {
     expect(consoleError).toHaveBeenCalled();
   });
 
+  test('keeps the generic browser copy when the API returns HTTP 429', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: async () => ({
+        error: 'Unable to generate a name right now. Please try again.',
+      }),
+    });
+
+    await expect(generateHipHopName('Phil', 'wanna live in rio', 'MC')).resolves.toEqual({
+      ok: false,
+      error: 'Unable to generate a name right now. Please try again.',
+    });
+    expect(consoleError).toHaveBeenCalled();
+  });
+
   test('returns a friendly error when the API returns an empty name', async () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
     global.fetch.mockResolvedValue({

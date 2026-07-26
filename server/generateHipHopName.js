@@ -1,5 +1,5 @@
 const OpenAI = require('openai');
-const { OPENAI_MODEL } = require('./config');
+const { getOpenAIModel } = require('./config');
 const {
   NAME_GENERATION_INSTRUCTIONS,
   buildNameGenerationInput,
@@ -18,7 +18,7 @@ async function generateHipHopNameWithOpenAI({
   client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY }),
 }) {
   const response = await client.responses.create({
-    model: OPENAI_MODEL,
+    model: getOpenAIModel(),
     instructions: NAME_GENERATION_INSTRUCTIONS,
     input: buildNameGenerationInput(realName, furtherInformation, prefix),
     max_output_tokens: 40,

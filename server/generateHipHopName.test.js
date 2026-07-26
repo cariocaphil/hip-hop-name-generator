@@ -148,13 +148,17 @@ test('POST /api/generate-hip-hop-name returns 400 when realName is missing', asy
   }
 });
 
-test('POST /api/generate-hip-hop-name maps upstream failures to a friendly error', async () => {
+test('POST /api/generate-hip-hop-name maps OpenAI 429 to HTTP 429 with friendly copy', async () => {
   process.env.OPENAI_API_KEY = 'test-key';
   const app = createApp({
     generateName: async () => {
-      const error = new Error('upstream down');
-      error.status = 500;
-      error.code = 'server_error';
+      const error = new Error(
+        '429 You exceeded your current quota, please check your plan and billing details.'
+      );
+      error.status = 429;
+      error.code = 'insufficient_quota';
+      error.type = 'insufficient_quota';
+      error.requestID = 'req_quota_test';
       throw error;
     },
   });
@@ -170,8 +174,68 @@ test('POST /api/generate-hip-hop-name maps upstream failures to a friendly error
     });
     const body = await response.json();
 
-    assert.equal(response.status, 500);
-    assert.match(body.error, /unable to generate a name/i);
+    assert.equal(response.status, 429);
+    assert.equal(body.error, 'Unable to generate a name right now. Please try again.');
+  } finally {
+    server.close();
+  }
+});
+
+test('POST /api/generate-hip-hop-name maps upstream failures to HTTP 503 with friendly copy', async () => {
+  process.env.OPENAI_API_KEY = 'test-key';
+  const app = createApp({
+    generateName: async () => {
+      const error = new Error('upstream down');
+      error.status = 500;
+      error.code = 'server_error';
+      error.type = 'server_error';
+      throw error;
+    },
+  });
+
+  const server = app.listen(0);
+  const { port } = server.address();
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/generate-hip-hop-name`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ realName: 'Alex' }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 503);
+    assert.equal(body.error, 'Unable to generate a name right now. Please try again.');
+  } finally {
+    server.close();
+  }
+});
+
+test('POST /api/generate-hip-hop-name maps auth failures to HTTP 503', async () => {
+  process.env.OPENAI_API_KEY = 'test-key';
+  const app = createApp({
+    generateName: async () => {
+      const error = new Error('Incorrect API key provided');
+      error.status = 401;
+      error.code = 'invalid_api_key';
+      error.type = 'invalid_request_error';
+      throw error;
+    },
+  });
+
+  const server = app.listen(0);
+  const { port } = server.address();
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/generate-hip-hop-name`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ realName: 'Alex' }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 503);
+    assert.equal(body.error, 'Unable to generate a name right now. Please try again.');
   } finally {
     server.close();
   }
