@@ -2,6 +2,40 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Accessibility comparison toggle (demo)
+
+This app includes a **demo-only** control that switches between two UI versions so reviewers can compare accessibility work side by side:
+
+- **After accessibility** (default) — the current accessible implementation
+- **Before accessibility** — reconstructed from Git history immediately before the accessibility improvements were merged
+
+### Historical source
+
+- Merge commit: `8e7d343` (*Merge pull request #3 … feature/accessibility-improvements*)
+- Pre-merge commit (merge first parent): `8a47751`
+- Reconstructed from files changed in that merge: `public/index.html`, `src/App.js`, `src/NameForm.js`, `src/styles.css`
+
+Document-level attributes (`lang`, `<title>`) stay accessible in `public/index.html` and are temporarily adjusted in the browser when **Before** is selected.
+
+### How to activate each mode
+
+- Use the **Demo comparison** radio group at the top of the page, or
+- Open a shareable URL:
+  - After: `/?accessibility=after` (or omit the param)
+  - Before: `/?accessibility=before`
+
+Invalid or missing values fall back to **after**. The choice is stored in the query string (no full page reload).
+
+### What the comparison covers
+
+Heading structure, link semantics, image `alt`, form labels, `tabIndex` misuse, option/button text, API error announcement (`role="alert"`), link contrast, and document `lang` / title.
+
+Shared across both modes: OpenAI name generation, app state, and unrelated business logic.
+
+### Removing the comparison later
+
+Delete `src/accessibility-comparison/`, point `App.js` back at a single UI (the `after` components), restore a simple `NameForm` export, and drop the README section.
+
 ## Available Scripts
 
 In the project directory, you can run:
