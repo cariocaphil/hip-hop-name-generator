@@ -1,0 +1,173 @@
+# =============================================================================
+# Continuous Integration (CI)
+# =============================================================================
+# Purpose
+#   Gate merges to main with lint, unit tests, and a production build.
+#
+# Required status check (branch protection)
+#   Settings → Branches → Branch protection rule for `main`:
+#     ☑ Require a pull request before merging
+#     ☑ Require status checks to pass before merging
+#     ☑ Require branches to be up to date before merging  (recommended)
+#     Status checks that are required:  **CI**
+#
+#   Require the aggregating job named "CI" (not lint/test/build individually).
+#   That way you can add jobs later without updating branch protection.
+#
+# Extending with CD
+#   See `.github/workflows/cd.yml`. CI uploads the `build` artifact so CD can
+#   download and deploy it without rebuilding. Keep deploy logic out of this
+#   file so PR checks stay fast and read-only.
+# =============================================================================
+
+name: CI
+
+on:
+  # Run on every PR targeting main — this is what branch protection evaluates.
+  pull_request:
+    branches: [main]
+
+  # Also run on pushes to main (e.g. after merge) so main stays green and CD
+  # can key off a successful CI run on the default branch.
+  push:
+    branches: [main]
+
+  # Manual re-runs from the Actions tab without pushing a new commit.
+  workflow_dispatch:
+
+# Cancel superseded runs on the same PR/branch to save minutes and surface
+# the latest result faster (important when CI is a required check).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Least privilege: CI only needs to read the repository.
+# Grant write permissions in CD (or per-job) when you add deployments.
+permissions:
+  contents: read
+
+env:
+  # CRA treats warnings as errors and runs tests non-interactively when CI=true.
+  CI: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Quality gate: static analysis
+  # ---------------------------------------------------------------------------
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # Shallow clone is enough for lint/test/build and is significantly faster.
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js and install dependencies
+        uses: ./.github/actions/setup-node-app
+
+      # Fail the job on any ESLint error or warning so style debt cannot land on main.
+      - name: Run ESLint
+        run: npm run lint
+
+  # ---------------------------------------------------------------------------
+  # Quality gate: automated tests
+  # ---------------------------------------------------------------------------
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js and install dependencies
+        uses: ./.github/actions/setup-node-app
+
+      # --watchAll=false: required in CI (react-scripts defaults to watch mode).
+      # --coverage: produces reports we can archive for PR review / trends.
+      # --forceExit: avoids hung Jest workers leaving the job stuck after tests pass.
+      - name: Run unit tests
+        run: npm test -- --watchAll=false --coverage --forceExit
+
+      # Optional visibility for reviewers; not required for the gate to pass.
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Quality gate: production build (+ artifact for future CD)
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js and install dependencies
+        uses: ./.github/actions/setup-node-app
+
+      # Verifies the app compiles for production (CRA also surfaces compile-time issues).
+      - name: Build production bundle
+        run: npm run build
+
+      # Persist the build so a future CD workflow can deploy without rebuilding.
+      # Artifact names are stable on purpose — reference them from cd.yml.
+      - name: Upload build artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: production-build
+          path: build/
+          if-no-files-found: error
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Aggregating gate — set THIS job as the required status check ("CI")
+  # ---------------------------------------------------------------------------
+  # Why a separate job?
+  #   Branch protection can require a single stable check name. Individual jobs
+  #   may be added/renamed later; this gate keeps the required check stable.
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # always() so we still fail the gate when a needed job fails or is cancelled.
+    if: always()
+    needs: [lint, test, build]
+
+    steps:
+      - name: Verify all CI jobs succeeded
+        run: |
+          set -euo pipefail
+
+          declare -A results=(
+            [lint]="${{ needs.lint.result }}"
+            [test]="${{ needs.test.result }}"
+            [build]="${{ needs.build.result }}"
+          )
+
+          failed=0
+          for job in "${!results[@]}"; do
+            result="${results[$job]}"
+            echo "$job → $result"
+            if [[ "$result" != "success" ]]; then
+              failed=1
+            fi
+          done
+
+          if [[ "$failed" -ne 0 ]]; then
+            echo "::error::One or more CI jobs did not succeed. Fix the failing job(s) before merging."
+            exit 1
+          fi
+
+          echo "All CI checks passed."

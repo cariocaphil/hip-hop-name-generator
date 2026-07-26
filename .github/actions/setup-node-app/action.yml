@@ -1,0 +1,27 @@
+# Composite action: shared Node + dependency install for CI (and later CD).
+# Callers must run actions/checkout first so package-lock.json is present for caching.
+name: Setup Node.js application
+description: Install Node.js from .nvmrc and restore npm dependencies via npm ci with cache
+
+inputs:
+  node-version-file:
+    description: Path to the Node version file (kept as an input so CD can override later)
+    required: false
+    default: '.nvmrc'
+
+runs:
+  using: composite
+  steps:
+    # setup-node caches the npm download cache (not node_modules). That is the
+    # recommended approach: faster, safer, and avoids stale node_modules artifacts.
+    - name: Set up Node.js
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version-file: ${{ inputs.node-version-file }}
+        cache: npm
+
+    # npm ci is reproducible and fails if package-lock.json is out of sync —
+    # preferred over npm install in CI to protect main from lockfile drift.
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
