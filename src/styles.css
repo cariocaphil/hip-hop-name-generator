@@ -1,9 +1,26 @@
+/* Shared layout */
 .container {
-    margin: 0 auto;
-    max-width: 400px;
-    padding: 20px;
-  }
+  margin: 0 auto;
+  max-width: 400px;
+  padding: 20px;
+}
 
-.link {
-color: blue;
+/*
+ * Contrast fix from accessibility-improvements (after).
+ * Scoped so the before demo can restore the original blue body background.
+ */
+body[data-accessibility-version='after'] .link,
+body:not([data-accessibility-version='before']) .link {
+  color: blue;
+}
+
+/* Pre-merge styles.css: solid blue page background (poor contrast). */
+body[data-accessibility-version='before'] {
+  background-color: blue;
+}
+
+body[data-accessibility-version='before'] .link {
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
 }

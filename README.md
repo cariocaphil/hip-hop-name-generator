@@ -1,6 +1,46 @@
-# Getting Started with Create React App
+# Hip Hop Name Generator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A small React app that illustrates **accessibility (a11y) issues** in a fun, before-and-after way.
+
+On the surface it generates a playful hip-hop stage name from your real name. Underneath, it is a teaching and portfolio demo: you can flip between an intentionally flawed UI and an improved, accessible version of the same flow, and see how markup, keyboard behaviour, labels, contrast, and announcements change.
+
+It was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Before-and-after comparison
+
+Use the **Demo comparison** control at the top of the page (or the URL) to switch modes without a reload:
+
+- **After accessibility** (default) — the current accessible implementation
+- **Before accessibility** — reconstructed from Git history immediately before the accessibility improvements were merged
+
+The “before” mode is meant to show common a11y pitfalls (missing labels, bad heading order, non-semantic links, poor contrast, and so on) against the fixed “after” experience—not as a production preference.
+
+### Historical source
+
+- Merge commit: `8e7d343` (*Merge pull request #3 … feature/accessibility-improvements*)
+- Pre-merge commit (merge first parent): `8a47751`
+- Reconstructed from files changed in that merge: `public/index.html`, `src/App.js`, `src/NameForm.js`, `src/styles.css`
+
+Document-level attributes (`lang`, `<title>`) stay accessible in `public/index.html` and are temporarily adjusted in the browser when **Before** is selected.
+
+### How to activate each mode
+
+- Use the **Demo comparison** radio group at the top of the page, or
+- Open a shareable URL:
+  - After: `/?accessibility=after` (or omit the param)
+  - Before: `/?accessibility=before`
+
+Invalid or missing values fall back to **after**. The choice is stored in the query string (no full page reload).
+
+### What the comparison covers
+
+Heading structure, link semantics, image `alt`, form labels, `tabIndex` misuse, option/button text, API error announcement (`role="alert"`), link contrast, and document `lang` / title.
+
+Shared across both modes: OpenAI name generation, app state, and unrelated business logic.
+
+### Removing the comparison later
+
+Delete `src/accessibility-comparison/`, point `App.js` back at a single UI (the `after` components), restore a simple `NameForm` export, and drop this section from the README.
 
 ## Available Scripts
 
