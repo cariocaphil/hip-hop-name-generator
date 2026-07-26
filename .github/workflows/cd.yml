@@ -1,0 +1,73 @@
+# =============================================================================
+# Continuous Deployment (CD) — stub for future use
+# =============================================================================
+# Keep deploy logic here so CI (the required PR check) stays fast and read-only.
+#
+# Recommended production pattern (when you are ready):
+#   on:
+#     workflow_run:
+#       workflows: [CI]
+#       types: [completed]
+#       branches: [main]
+#   jobs:
+#     deploy:
+#       if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#       ...
+#       - uses: actions/download-artifact@...
+#         with:
+#           name: production-build
+#           path: build
+#           run-id: ${{ github.event.workflow_run.id }}
+#           github-token: ${{ secrets.GITHUB_TOKEN }}
+#
+# Until then this workflow only runs manually so it never blocks merges.
+# =============================================================================
+
+name: CD
+
+on:
+  # Manual only until a real deploy target exists.
+  workflow_dispatch:
+
+concurrency:
+  # Never cancel an in-flight production deploy; queue instead.
+  group: cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+# Start read-only. Add contents: write / id-token: write when a provider needs them.
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Uncomment to require reviewers / environment secrets before deploy:
+    # environment: production
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Same install path as CI so local/CD tooling stays consistent.
+      - name: Set up Node.js and install dependencies
+        uses: ./.github/actions/setup-node-app
+
+      # Rebuild here for the stub. Prefer downloading CI's `production-build`
+      # artifact once you switch this workflow to `workflow_run` (see header).
+      - name: Build production bundle
+        env:
+          CI: true
+        run: npm run build
+
+      - name: Placeholder — replace with your deploy command
+        run: |
+          set -euo pipefail
+          echo "CD stub: no deploy target configured yet."
+          echo "Next steps:"
+          echo "  1. Choose a host (Pages, S3+CloudFront, Netlify, etc.)"
+          echo "  2. Add provider secrets / OIDC under Settings → Environments"
+          echo "  3. Prefer workflow_run + download of CI artifact 'production-build'"
+          echo "  4. Replace this step with the deploy action or CLI"
+          ls -la build | head
