@@ -97,12 +97,17 @@ describe('accessibility comparison mode', () => {
   });
 
   test('before API failure has no alert role; after announces with role=alert', async () => {
-    generateHipHopName.mockResolvedValue(null);
+    generateHipHopName.mockResolvedValue({
+      ok: false,
+      error: 'Unable to generate a name right now. Please try again.',
+    });
 
     const { unmount } = render(<App />);
     fireEvent.change(screen.getByLabelText(/real name/i), { target: { value: 'Alex' } });
     fireEvent.click(screen.getByRole('button', { name: /generate new name/i }));
-    expect(await screen.findByRole('alert')).toHaveTextContent(/api not available/i);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      /unable to generate a name right now/i
+    );
     unmount();
 
     window.history.replaceState(null, '', '/?accessibility=before');
@@ -111,7 +116,9 @@ describe('accessibility comparison mode', () => {
     fireEvent.change(nameInput, { target: { value: 'Alex' } });
     fireEvent.click(screen.getByRole('button', { name: /submit form/i }));
 
-    expect(await screen.findByText(/api not available/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/unable to generate a name right now/i)
+    ).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

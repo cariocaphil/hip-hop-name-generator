@@ -16,12 +16,23 @@ import BeforeAppContent from './accessibility-comparison/before/BeforeAppContent
 const AppShell = () => {
   const { accessibilityVersion } = useAccessibilityVersion();
   const [hipHopName, setHipHopName] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleFormSubmit = async (name, additionalInfo, prefix) => {
     setLoading(true);
-    const nextName = await generateHipHopName(name, additionalInfo, prefix);
-    setHipHopName(nextName);
+    setErrorMessage(null);
+
+    const result = await generateHipHopName(name, additionalInfo, prefix);
+
+    if (result.ok) {
+      setHipHopName(result.hipHopName);
+      setErrorMessage(null);
+    } else {
+      setHipHopName(null);
+      setErrorMessage(result.error);
+    }
+
     setLoading(false);
   };
 
@@ -29,6 +40,7 @@ const AppShell = () => {
     onFormSubmit: handleFormSubmit,
     loading,
     hipHopName,
+    errorMessage,
   };
 
   return (

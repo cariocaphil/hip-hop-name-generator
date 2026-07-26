@@ -41,20 +41,25 @@ describe('App', () => {
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
 
     await act(async () => {
-      resolveName('MC Shadow');
+      resolveName({ ok: true, hipHopName: 'MC Shadow' });
     });
 
     expect(screen.getByText(/your hip hop name is: mc shadow/i)).toBeInTheDocument();
   });
 
-  test('shows alert when API returns null', async () => {
-    generateHipHopName.mockResolvedValue(null);
+  test('shows alert when name generation fails', async () => {
+    generateHipHopName.mockResolvedValue({
+      ok: false,
+      error: 'Unable to generate a name right now. Please try again.',
+    });
 
     render(<App />);
 
     fireEvent.change(screen.getByLabelText(/real name/i), { target: { value: 'Alex' } });
     fireEvent.click(screen.getByRole('button', { name: /generate new name/i }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(/api not available/i);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      /unable to generate a name right now/i
+    );
   });
 });

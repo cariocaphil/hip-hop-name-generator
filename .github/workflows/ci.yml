@@ -92,6 +92,10 @@ jobs:
       - name: Run unit tests
         run: npm test -- --watchAll=false --coverage --forceExit
 
+      # Server-side OpenAI proxy tests (Node built-in test runner; no API key required).
+      - name: Run API server tests
+        run: npm run test:server
+
       # Optional visibility for reviewers; not required for the gate to pass.
       - name: Upload coverage report
         if: always()

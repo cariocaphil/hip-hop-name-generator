@@ -6,7 +6,7 @@ import BeforeNameForm from './BeforeNameForm';
  * Pre-accessibility App chrome reconstructed from commit 8a47751.
  * Shares submit handler / loading / result state with the after variant.
  */
-const BeforeAppContent = ({ onFormSubmit, loading, hipHopName }) => {
+const BeforeAppContent = ({ onFormSubmit, loading, hipHopName, errorMessage }) => {
   const goToWikipedia = () => {
     window.location.href = 'https://en.wikipedia.org/wiki/Hip_hop_artists';
   };
@@ -33,7 +33,7 @@ const BeforeAppContent = ({ onFormSubmit, loading, hipHopName }) => {
       ) : hipHopName !== null ? (
         <p>Your hip hop name is: {hipHopName}</p>
       ) : (
-        <p>API not available</p>
+        <p>{errorMessage || 'Unable to generate a name right now. Please try again.'}</p>
       )}
     </div>
   );
